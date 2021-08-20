@@ -1,0 +1,77 @@
+import React, { useState } from 'react';
+import {
+  Button, Flex, Text, Image, Icon,
+} from '@chakra-ui/react';
+import { FaCartPlus } from 'react-icons/fa';
+import { ICard } from '../types/index';
+import { useCart } from '../context/Cart';
+import isOnCart from '../utils/isOnCart';
+
+const ComicCard = (props:ICard) => {
+  const [isDisable, setIsDisable] = useState(false);
+  const {
+    id, title, image, price, rare,
+  } = props;
+  const { cart, setCart } = useCart();
+
+  const addButton = () => {
+    const obj = {
+      id, title, image, price,
+    };
+    if (cart.some((elem:ICard) => elem.id === obj.id)) {
+      return;
+    }
+    setCart(cart.concat({
+      id, title, image, price, rare, amount: 1,
+    }));
+    setIsDisable(true);
+  };
+
+  return (
+    <Flex
+      flexDir="column"
+      alignItems="center"
+      justifyContent="space-between"
+      w="150px"
+      m={1}
+      borderRadius={5}
+      bg="card.bg"
+      p={1}
+      boxShadow={`${rare ? '0 0px 10px 0 rgba(255, 236, 92, 1), 0 0px 10px 0 rgba(255, 236, 92, 0.8)' : '0 0px 4px 0 rgba(255, 255, 255, 1), 0 0px 20px 0 rgba(255, 255, 255, 0.3)'}`}
+    >
+      <Flex
+        flexDir="column"
+        alignItems="center"
+        justifyContent="flex-start"
+      >
+        <Image
+          src={`${image}/portrait_xlarge.jpg`}
+          alt={`${title}`}
+          borderTopRadius={5}
+        />
+        <Text color="card.title" fontWeight="bold" fontSize="sm" fontFamily="Roboto Bold">{`${title} ${rare ? 'Rare*' : ''}`}</Text>
+      </Flex>
+      <Flex
+        flexDir="column"
+        alignItems="center"
+        justifyContent="flex-end"
+      >
+
+        <Text color="card.priceColor" fontWeight="bold" fontSize="sm" fontFamily="Roboto Bold">{`US$: ${price}`}</Text>
+        <Button
+          isDisabled={isDisable || isOnCart(id!, cart)}
+          size="sm"
+          bg="button.bg"
+          color="button.color"
+          onClick={addButton}
+          _hover={{ bg: 'button.bgHover' }}
+          px={5}
+        >
+          <Icon as={FaCartPlus} boxSize={5} />
+        </Button>
+      </Flex>
+    </Flex>
+  );
+};
+
+export default ComicCard;
